@@ -13,31 +13,36 @@ Grafo criaGrafo(int vertices);
 int **alocaMatriz(int linha, int coluna, int valor);
 void insereAresta(Grafo g, int a, int b, int peso);
 void imprimeGrafo(Grafo g);
+int **geraMatrizVertice(Grafo g);
 
 int main() {
-    int menu,numVert,vertOrigem,vertDestino,peso;
+    int menu, numVert, vertOrigem, vertDestino, peso;
 
     printf("Numero de vertices\n");
     scanf("%d", &numVert);
-
     Grafo grafo = criaGrafo(numVert);
-    do{
-        printf("1-Adicionar aresta\n2-Imprimir grafo\n0-Sair\n");
+
+    do {
+        printf("1-Adicionar aresta\n2-Imprimir grafo\n3-Calcular menor caminho (Dijikstra)\n0-Sair\n");
         scanf("%d", &menu);
-        if(menu==1){
-            
+        if (menu == 1) {
+
             printf("Vertice origem: ");
             scanf("%d", &vertOrigem);
             printf("Vertice destino: ");
             scanf("%d", &vertDestino);
             printf("Peso da aresta: ");
             scanf("%d", &peso);
-            insereAresta(grafo,vertOrigem,vertDestino,peso);
-            
-        }else if(menu==2){
+            insereAresta(grafo, vertOrigem, vertDestino, peso);
+
+        } else if (menu == 2) {
             imprimeGrafo(grafo);
+        } else if (menu == 3) {
+            int **matriz = geraMatrizVertice(grafo);
+                
+         
         }
-    }while(menu!=0);
+    } while (menu != 0);
 
 
 
@@ -77,8 +82,24 @@ void imprimeGrafo(Grafo g) {
         printf("%2d:", i);
         for (int j = 0; j < g->vertices; j++) {
             if (g->adj[i][j] > 0)
-                printf(" %2d -> %d", j,g->adj[i][j]);
+                printf(" %2d -> %d", j, g->adj[i][j]);
         }
         printf("\n");
     }
+}
+
+int **geraMatrizVertice(Grafo g) {
+    int **buffer = malloc(g->vertices * sizeof (int *));
+    for (int i = 0; i < g->vertices; i++) {
+        buffer[i] = malloc(3 * sizeof (int));
+    }
+    for (int i = 0; i < g->vertices; i++) {
+        //coluna 0 - distancia
+        buffer[i][0] = 999;
+        //coluna 1 - indice pai
+        buffer[i][1] = -1;
+        //coluna 2 - vertice ja verificado (0 | 1)
+        buffer[i][2] = 0;
+    }
+    return buffer;
 }
