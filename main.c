@@ -14,13 +14,44 @@ int **alocaMatriz(int linha, int coluna, int valor);
 void insereAresta(Grafo g, int a, int b, int peso);
 void imprimeGrafo(Grafo g);
 int **geraMatrizVertice(Grafo g);
+int calculaMenorCaminhoDijkstra(Grafo grafo, int verticeInicial, int verticeFinal);
 
 int main() {
-    int menu, numVert, vertOrigem, vertDestino, peso;
+    int menu, numVert, vertOrigem, vertDestino, peso, resultado, vertInicio, vertFim;
 
     printf("Numero de vertices\n");
     scanf("%d", &numVert);
     Grafo grafo = criaGrafo(numVert);
+
+    grafo->adj[0][0] = 0;
+    grafo->adj[0][1] = 4;
+    grafo->adj[0][2] = 2;
+    grafo->adj[0][3] = 0;
+    grafo->adj[0][4] = 1;
+
+    grafo->adj[1][0] = 0;
+    grafo->adj[1][1] = 0;
+    grafo->adj[1][2] = 0;
+    grafo->adj[1][3] = 5;
+    grafo->adj[1][4] = 0;
+
+    grafo->adj[2][0] = 0;
+    grafo->adj[2][1] = 0;
+    grafo->adj[2][2] = 0;
+    grafo->adj[2][3] = 6;
+    grafo->adj[2][4] = 0;
+
+    grafo->adj[3][0] = 0;
+    grafo->adj[3][1] = 0;
+    grafo->adj[3][2] = 0;
+    grafo->adj[3][3] = 0;
+    grafo->adj[3][4] = 0;
+
+    grafo->adj[4][0] = 0;
+    grafo->adj[4][1] = 1;
+    grafo->adj[4][2] = 0;
+    grafo->adj[4][3] = 0;
+    grafo->adj[4][4] = 0;
 
     do {
         printf("1-Adicionar aresta\n2-Imprimir grafo\n3-Calcular menor caminho (Dijikstra)\n0-Sair\n");
@@ -38,13 +69,15 @@ int main() {
         } else if (menu == 2) {
             imprimeGrafo(grafo);
         } else if (menu == 3) {
-            int **matriz = geraMatrizVertice(grafo);
-                
-         
+            printf("Vertice inicial: ");
+            scanf("%d", &vertInicio);
+            printf("Vertice final: ");
+            scanf("%d", &vertFim);
+
+            resultado = calculaMenorCaminhoDijkstra(grafo, vertInicio, vertFim);
+            printf("\nMenor Caminho (Dijikstra): %d\n\n", resultado);
         }
     } while (menu != 0);
-
-
 
     return (0);
 }
@@ -102,4 +135,62 @@ int **geraMatrizVertice(Grafo g) {
         buffer[i][2] = 0;
     }
     return buffer;
+}
+
+int calculaMenorCaminhoDijkstra(Grafo grafo, int verticeInicial, int verticeFinal) {
+    int **matriz = geraMatrizVertice(grafo);
+
+    matriz[verticeInicial][0] = 0;
+
+    //navega por todos os vertices
+    for (int i = 0; i < grafo->vertices; i++) {
+
+        int paiMin = -1;
+        int menorValor = 9999;
+
+        //navega por todas as estimações
+        for (int j = 0; j < grafo->vertices; j++) {
+            //nao visitado e menor valor
+            if (!matriz[j][2] && matriz[j][0] < menorValor) {
+                paiMin = j;
+                menorValor = matriz[j][0];
+            }
+        }
+
+        //marca como visitado
+        matriz[paiMin][2] = 1;
+
+        //verifica se chegou ao fim do caminho
+        if (paiMin == verticeFinal) {
+            return matriz[paiMin][0];
+        }
+
+        for (int j = 0; j < grafo->vertices; j++) {
+            //vê se é filho
+            if (grafo->adj[paiMin][j] > 0) {
+                //estimado pai + peso aresta pai filho < estimado filho
+                if (matriz[paiMin][0] + grafo->adj[paiMin][j] < matriz[j][0]) {
+                    //estiamdo filho = estimado pai + aresta pai filho
+                    matriz[j][0] = matriz[paiMin][0] + grafo->adj[paiMin][j];
+                    matriz[j][1] = paiMin;
+                }
+            }
+        }
+    }
+
+    /*
+    printf("\n\n");
+    for (int j = 0; j < grafo->vertices; j++) {
+        printf("%d : %d\n", j, matriz[j][0]);
+    }
+    printf("\n\n");
+    for (int j = 0; j < grafo->vertices; j++) {
+        printf("%d : %d\n", j, matriz[j][1]);
+    }
+    printf("\n\n");
+    for (int j = 0; j < grafo->vertices; j++) {
+        printf("%d : %d\n", j, matriz[j][2]);
+    }
+    */
+    
 }
