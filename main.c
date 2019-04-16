@@ -15,6 +15,8 @@ void insereAresta(Grafo g, int a, int b, int peso);
 void imprimeGrafo(Grafo g);
 int **geraMatrizVertice(Grafo g);
 int calculaMenorCaminhoDijkstra(Grafo grafo, int verticeInicial, int verticeFinal);
+int calculaMenorCaminhoGuloso(Grafo grafo, int verticeInicial, int verticeFinal);
+int buscaProfundidadeFinal(int *buffer, int verticeInicio, int verticeFinal, Grafo grafo);
 
 int main() {
     int menu, numVert, vertOrigem, vertDestino, peso, resultado, vertInicio, vertFim;
@@ -24,8 +26,8 @@ int main() {
     Grafo grafo = criaGrafo(numVert);
 
     grafo->adj[0][0] = 0;
-    grafo->adj[0][1] = 4;
-    grafo->adj[0][2] = 2;
+    grafo->adj[0][1] = 2;
+    grafo->adj[0][2] = 3;
     grafo->adj[0][3] = 0;
     grafo->adj[0][4] = 1;
 
@@ -48,13 +50,14 @@ int main() {
     grafo->adj[3][4] = 0;
 
     grafo->adj[4][0] = 0;
-    grafo->adj[4][1] = 1;
+    grafo->adj[4][1] = 10;
     grafo->adj[4][2] = 0;
-    grafo->adj[4][3] = 0;
+    grafo->adj[4][3] = 2;
     grafo->adj[4][4] = 0;
 
     do {
-        printf("1-Adicionar aresta\n2-Imprimir grafo\n3-Calcular menor caminho (Dijikstra)\n0-Sair\n");
+        printf("1-Adicionar aresta\n2-Imprimir grafo\n3-Calcular menor caminho (Dijikstra)\n"
+                "4-Calcular menor caminho (Algoritmo Guloso)\n0-Sair\n");
         scanf("%d", &menu);
         if (menu == 1) {
 
@@ -76,6 +79,14 @@ int main() {
 
             resultado = calculaMenorCaminhoDijkstra(grafo, vertInicio, vertFim);
             printf("\nMenor Caminho (Dijikstra): %d\n\n", resultado);
+        } else if (menu == 4) {
+            printf("Vertice inicial: ");
+            scanf("%d", &vertInicio);
+            printf("Vertice final: ");
+            scanf("%d", &vertFim);
+
+            resultado = calculaMenorCaminhoGuloso(grafo, vertInicio, vertFim);
+            printf("\nMenor Caminho (Algoritmo Guloso): %d\n\n", resultado);
         }
     } while (menu != 0);
 
@@ -177,20 +188,66 @@ int calculaMenorCaminhoDijkstra(Grafo grafo, int verticeInicial, int verticeFina
             }
         }
     }
+}
 
-    /*
-    printf("\n\n");
-    for (int j = 0; j < grafo->vertices; j++) {
-        printf("%d : %d\n", j, matriz[j][0]);
-    }
-    printf("\n\n");
-    for (int j = 0; j < grafo->vertices; j++) {
-        printf("%d : %d\n", j, matriz[j][1]);
-    }
-    printf("\n\n");
-    for (int j = 0; j < grafo->vertices; j++) {
-        printf("%d : %d\n", j, matriz[j][2]);
-    }
-    */
+int calculaMenorCaminhoGuloso(Grafo grafo, int verticeInicial, int verticeFinal) {
+    int soma = 0;
+    int posVertAtual = verticeInicial;
     
+    //vetor para marcar visitado na função para ver se chega ao final
+    int *buffer = malloc(grafo->vertices * sizeof (int));
+    int menorAdja, posMenorAdja;
+
+    while (posVertAtual != verticeFinal) {
+        //zera teste menor adjacente
+        menorAdja=0;
+        
+        //percorre adjacentes
+        for (int j = 0; j < grafo->vertices; j++) {
+            
+            
+            //zera vetor visitado
+            for (int i = 0; i < grafo->vertices; i++) {
+                buffer[i] = 0;
+            }
+    
+            //verifica se é filho
+            if (grafo->adj[posVertAtual][j] != 0) {
+                //verifica se chega até o vertice final
+                int chegaFinal = buscaProfundidadeFinal(buffer,j,verticeFinal,grafo);
+                if(chegaFinal){
+                    if(grafo->adj[posVertAtual][j] < menorAdja || menorAdja==0){
+                        menorAdja=grafo->adj[posVertAtual][j];
+                        posMenorAdja=j;
+                    } 
+                }           
+            }
+        }
+        
+        soma+=menorAdja;
+        posVertAtual = posMenorAdja;
+        
+    }
+    return soma;
+}
+
+int buscaProfundidadeFinal(int *buffer, int verticeInicio, int verticeFinal, Grafo grafo) {
+    buffer[verticeInicio] = 1;
+    int posFinal = 0;
+
+    for (int i = 0; i < grafo->vertices; i++) {
+        //verifica se é filho
+        if (grafo->adj[verticeInicio][i] != 0) {
+            if (!buffer[grafo->adj[verticeInicio][i]]) {
+                posFinal = i;
+                buscaProfundidadeFinal(buffer, i, verticeFinal, grafo);
+            }
+        }
+    }
+    
+    if (posFinal = verticeFinal) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
