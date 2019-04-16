@@ -52,7 +52,7 @@ int main() {
     grafo->adj[4][0] = 0;
     grafo->adj[4][1] = 10;
     grafo->adj[4][2] = 0;
-    grafo->adj[4][3] = 2;
+    grafo->adj[4][3] = 0;
     grafo->adj[4][4] = 0;
 
     do {
