@@ -86,7 +86,7 @@ int main() {
             scanf("%d", &vertFim);
 
             resultado = calculaMenorCaminhoGuloso(grafo, vertInicio, vertFim);
-            printf("\nMenor Caminho (Algoritmo Guloso): %d\n\n", resultado);
+            printf("\n\nMenor Caminho (Algoritmo Guloso): %d\n\n", resultado);
         }
     } while (menu != 0);
 
@@ -181,7 +181,7 @@ int calculaMenorCaminhoDijkstra(Grafo grafo, int verticeInicial, int verticeFina
             if (grafo->adj[paiMin][j] > 0) {
                 //estimado pai + peso aresta pai filho < estimado filho
                 if (matriz[paiMin][0] + grafo->adj[paiMin][j] < matriz[j][0]) {
-                    //estiamdo filho = estimado pai + aresta pai filho
+                    //estimado filho = estimado pai + aresta pai filho
                     matriz[j][0] = matriz[paiMin][0] + grafo->adj[paiMin][j];
                     matriz[j][1] = paiMin;
                 }
@@ -198,6 +198,8 @@ int calculaMenorCaminhoGuloso(Grafo grafo, int verticeInicial, int verticeFinal)
     int *buffer = malloc(grafo->vertices * sizeof (int));
     int menorAdja, posMenorAdja;
 
+    printf("\n\nCaminho: %d",verticeInicial);
+    
     while (posVertAtual != verticeFinal) {
         //zera teste menor adjacente
         menorAdja=0;
@@ -224,10 +226,12 @@ int calculaMenorCaminhoGuloso(Grafo grafo, int verticeInicial, int verticeFinal)
             }
         }
         
+        printf(" -> %d", posMenorAdja);
         soma+=menorAdja;
         posVertAtual = posMenorAdja;
         
     }
+    
     return soma;
 }
 
